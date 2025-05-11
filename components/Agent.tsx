@@ -5,9 +5,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-// import { vapi } from "@/lib/vapi.sdk";
-// import { interviewer } from "@/constants";
-// import { createFeedback } from "@/lib/actions/general.action";
+import { vapi } from "@/lib/vapi.sdk";
+import { interviewer } from "@/constants";
+import { createFeedback } from "@/lib/actions/general.action";
+
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -35,115 +36,119 @@ const Agent = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [lastMessage, setLastMessage] = useState<string>("");
 
-//   useEffect(() => {
-//     const onCallStart = () => {
-//       setCallStatus(CallStatus.ACTIVE);
-//     };
+  useEffect(() => {
+    const onCallStart = () => {
+      setCallStatus(CallStatus.ACTIVE);
+    };
 
-//     const onCallEnd = () => {
-//       setCallStatus(CallStatus.FINISHED);
-//     };
+    const onCallEnd = () => {
+      setCallStatus(CallStatus.FINISHED);
+    };
 
-//     const onMessage = (message: Message) => {
-//       if (message.type === "transcript" && message.transcriptType === "final") {
-//         const newMessage = { role: message.role, content: message.transcript };
-//         setMessages((prev) => [...prev, newMessage]);
-//       }
-//     };
+    const onMessage = (message: Message) => {
+      if (message.type === "transcript" && message.transcriptType === "final") {
+        const newMessage = { role: message.role, content: message.transcript };
+        setMessages((prev) => [...prev, newMessage]);
+      }
+    };
 
-//     const onSpeechStart = () => {
-//       console.log("speech start");
-//       setIsSpeaking(true);
-//     };
+    const onSpeechStart = () => {
+      console.log("speech start");
+      setIsSpeaking(true);
+    };
 
-//     const onSpeechEnd = () => {
-//       console.log("speech end");
-//       setIsSpeaking(false);
-//     };
+    const onSpeechEnd = () => {
+      console.log("speech end");
+      setIsSpeaking(false);
+    };
 
-//     const onError = (error: Error) => {
-//       console.log("Error:", error);
-//     };
+    const onError = (error: Error) => {
+      console.log("Error:", error);
+    };
 
-    // vapi.on("call-start", onCallStart);
-    // vapi.on("call-end", onCallEnd);
-    // vapi.on("message", onMessage);
-    // vapi.on("speech-start", onSpeechStart);
-    // vapi.on("speech-end", onSpeechEnd);
-    // vapi.on("error", onError);
+    vapi.on("call-start", onCallStart);
+    vapi.on("call-end", onCallEnd);
+    vapi.on("message", onMessage);
+    vapi.on("speech-start", onSpeechStart);
+    vapi.on("speech-end", onSpeechEnd);
+    vapi.on("error", onError);
 
-    // return () => {
-    //   vapi.off("call-start", onCallStart);
-    //   vapi.off("call-end", onCallEnd);
-    //   vapi.off("message", onMessage);
-    //   vapi.off("speech-start", onSpeechStart);
-//     //   vapi.off("speech-end", onSpeechEnd);
-//     //   vapi.off("error", onError);
-//     };
-//   }, []);
+    return () => {
+      vapi.off("call-start", onCallStart);
+      vapi.off("call-end", onCallEnd);
+      vapi.off("message", onMessage);
+      vapi.off("speech-start", onSpeechStart);
+      vapi.off("speech-end", onSpeechEnd);
+      vapi.off("error", onError);
+    };
+  }, []);
 
-//   useEffect(() => {
-//     if (messages.length > 0) {
-//       setLastMessage(messages[messages.length - 1].content);
-//     }
+  useEffect(() => {
+    if (messages.length > 0) {
+      setLastMessage(messages[messages.length - 1].content);
+    }
 
-    // const handleGenerateFeedback = async (messages: SavedMessage[]) => {
-    //   console.log("handleGenerateFeedback");
+    const handleGenerateFeedback = async (messages: SavedMessage[]) => {
+      console.log("handleGenerateFeedback");
 
-    //   const { success, feedbackId: id } = await createFeedback({
-    //     interviewId: interviewId!,
-    //     userId: userId!,
-    //     transcript: messages,
-    //     feedbackId,
-    //   });
+      const { success, feedbackId: id } = await createFeedback({
+        interviewId: interviewId!,
+        userId: userId!,
+        transcript: messages,
+        feedbackId,
+      });
 
-    //   if (success && id) {
-    //     router.push(`/interview/${interviewId}/feedback`);
-    //   } else {
-    //     console.log("Error saving feedback");
-    //     router.push("/");
-    //   }
-    // };
+      if (success && id) {
+        router.push(`/interview/${interviewId}/feedback`);
+      } else {
+        console.log("Error saving feedback");
+        router.push("/");
+      }
+    };
 
-//     if (callStatus === CallStatus.FINISHED) {
-//       if (type === "generate") {
-//         router.push("/");
-//       } else {
-//         handleGenerateFeedback(messages);
-//       }
-//     }
-//   }, [messages, callStatus, feedbackId, interviewId, router, type, userId]);
+    if (callStatus === CallStatus.FINISHED) {
+      if (type === "generate") {
+        router.push("/");
+      } else {
+        handleGenerateFeedback(messages);
+      }
+    }
+  }, [messages, callStatus, feedbackId, interviewId, router, type, userId]);
 
-//   const handleCall = async () => {
-//     setCallStatus(CallStatus.CONNECTING);
+  const handleCall = async () => {
+    setCallStatus(CallStatus.CONNECTING);
 
-//     if (type === "generate") {
-//       await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
-//         variableValues: {
-//           username: userName,
-//           userid: userId,
-//         },
-//       });
-//     } else {
-//       let formattedQuestions = "";
-//       if (questions) {
-//         formattedQuestions = questions
-//           .map((question) => `- ${question}`)
-//           .join("\n");
-//       }
+    if (type === "generate") {
+      await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
+        variableValues: {
+          username: userName,
+          userid: userId,
+        },
+        clientMessages: [],
+        serverMessages: []
+      });
+    } else {
+      let formattedQuestions = "";
+      if (questions) {
+        formattedQuestions = questions
+          .map((question) => `- ${question}`)
+          .join("\n");
+      }
 
-//       await vapi.start(interviewer, {
-//         variableValues: {
-//           questions: formattedQuestions,
-//         },
-//       });
-//     }
-//   };
+      await vapi.start(interviewer, {
+        variableValues: {
+          questions: formattedQuestions,
+        },
+        clientMessages: [],
+        serverMessages: []
+      });
+    }
+  };
 
-//   const handleDisconnect = () => {
-//     setCallStatus(CallStatus.FINISHED);
-//     vapi.stop();
-//   };
+  const handleDisconnect = () => {
+    setCallStatus(CallStatus.FINISHED);
+    vapi.stop();
+  };
 
   return (
     <>
@@ -196,7 +201,7 @@ const Agent = ({
 
       <div className="w-full flex justify-center">
         {callStatus !== "ACTIVE" ? (
-          <button className="relative btn-call" >
+          <button className="relative btn-call" onClick={() => handleCall()}>
             <span
               className={cn(
                 "absolute animate-ping rounded-full opacity-75",
@@ -211,7 +216,7 @@ const Agent = ({
             </span>
           </button>
         ) : (
-          <button className="btn-disconnect" >
+          <button className="btn-disconnect" onClick={() => handleDisconnect()}>
             End
           </button>
         )}

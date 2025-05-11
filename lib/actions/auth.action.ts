@@ -1,6 +1,7 @@
 "use server";
 
 import { auth, db } from "@/firebase/admin";
+import { CollectionReference } from "firebase-admin/firestore";
 import { cookies } from "next/headers";
 
 // Session duration (1 week)
