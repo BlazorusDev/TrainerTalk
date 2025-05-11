@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
 import { Toaster } from "sonner";
+import type { Metadata } from "next";
+import { Mona_Sans } from "next/font/google";
 
-// Use a valid font from next/font/google
-const inter = Inter({
-  variable: "--font-inter",
+import "./globals.css";
+
+const monaSans = Mona_Sans({
+  variable: "--font-mona-sans",
   subsets: ["latin"],
 });
 
@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} antialiased pattern`}>
+      <body className={`${monaSans.className} antialiased pattern`}>
         {children}
         <Toaster />
       </body>
