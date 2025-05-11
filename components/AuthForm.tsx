@@ -4,42 +4,49 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
+import { Form } from "./ui/form";
+import FormField from "./FormField";
+import { useRouter } from "next/navigation";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
     name: type === "sign-up" ? z.string().min(3) : z.string().optional(),
-    email: z.string().email({ message: "Invalid email address" }),
-    password: z
-      .string()
-      .min(6, { message: "Password must be at least 6 characters long" }),
+    email: z.string().email(),
+    password: z.string().min(3),
   });
 };
 
 const AuthForm = ({ type }: { type: FormType }) => {
+  const router = useRouter();
+  const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      name: "",
+      email: "",
+      password: "",
     },
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    try {
+      if (type === "sign-up") {
+        toast.success("Account created successfully!");
+        router.push("/sign-in");
+      } else {
+        toast.success("Logged in successfully!");
+        router.push("/");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
+    }
   };
 
-  const isSignUp = type === "sign-up";
   const isSignIn = type === "sign-in";
 
   return (
@@ -56,9 +63,31 @@ const AuthForm = ({ type }: { type: FormType }) => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="w-full space-y-6 mt-4 form"
           >
-            {!isSignIn && <p>Name</p>}
-            <p>Email</p>
-            <p>Password</p>
+            {!isSignIn && (
+              <FormField
+                control={form.control}
+                name="name"
+                label="Name"
+                placeholder="Your Name"
+                type="text"
+              />
+            )}
+
+            <FormField
+              control={form.control}
+              name="email"
+              label="Email"
+              placeholder="example@email.com"
+              type="email"
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              label="Password"
+              placeholder="••••••••"
+              type="password"
+            />
 
             <Button className="btn" type="submit">
               {isSignIn ? "Sign In" : "Create an Account"}
