@@ -97,7 +97,7 @@ export const mappings = {
   "aws amplify": "amplify",
 };
 
-export const interviewer : CreateAssistantDTO = {
+export const Interviewer: CreateAssistantDTO = {
   name: "Interviewer",
   firstMessage: "Hello! Thank you for taking the time to speak with me today. I'm excited to learn more about you and your experience.",
   transcriber: {
@@ -215,7 +215,7 @@ export const dummyInterviews: Interview[] = [
     level: "Junior",
     questions: ["What is React?"],
     finalized: false,
-    createdAt: "2025-03-15T10:00:00Z",
+    createdAt: "2024-03-15T10:00:00Z",
   },
   {
     id: "2",
@@ -226,6 +226,6 @@ export const dummyInterviews: Interview[] = [
     level: "Senior",
     questions: ["What is Node.js?"],
     finalized: false,
-    createdAt: "2025-03-14T15:30:00Z",
+    createdAt: "2024-03-14T15:30:00Z",
   },
 ];
